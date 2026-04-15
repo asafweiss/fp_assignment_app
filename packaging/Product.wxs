@@ -1,0 +1,72 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="1stProtectApp" Manufacturer="1stProtect" Version="1.0.1.0" UpgradeCode="d6ca8e50-25bc-488f-a9cb-33924c5b65f7" Scope="perMachine">
+    <MajorUpgrade DowngradeErrorMessage="A newer version is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <Property Id="LOG_LEVEL" Value="INFO" />
+
+    <Feature Id="Main" Title="Main Feature">
+      <ComponentGroupRef Id="AppComponents" />
+    </Feature>
+  </Package>
+
+  <Fragment>
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="1stProtect" />
+    </StandardDirectory>
+
+    <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
+      <Component Id="LoggerExecutable" Guid="a659cc68-3e5e-4c7b-91db-75ae21dfc6a3">
+        <!-- Deploy the compiled Logger Go binary -->
+        <File Id="LoggerExe" Source="..\build\logger.exe" KeyPath="yes" />
+        
+        <!-- Register as a background Windows Service -->
+        <ServiceInstall Id="LoggerSvcInstall"
+                        Type="ownProcess"
+                        Name="1stProtectLogger"
+                        DisplayName="1stProtect Logger"
+                        Description="Background logger for 1stProtect"
+                        Start="auto"
+                        ErrorControl="normal" />
+        
+        <!-- Control the service during Setup/Teardown -->
+        <ServiceControl Id="LoggerSvcControl" 
+                        Start="install" 
+                        Stop="both" 
+                        Remove="uninstall" 
+                        Name="1stProtectLogger" 
+                        Wait="yes" />
+                        
+        <!-- Set the System Environment Variable so the service picks up the log level -->
+        <Environment Id="EnvLogLevel"
+                     Name="LOG_LEVEL"
+                     Value="[LOG_LEVEL]"
+                     Action="set"
+                     System="yes"
+                     Part="all" />
+      </Component>
+
+      <Component Id="MonitorExecutable" Guid="3f69527e-85a7-47b2-b1e7-fb6cfc989c97">
+        <!-- Deploy the compiled Monitor Go binary -->
+        <File Id="MonitorExe" Source="..\build\monitor.exe" KeyPath="yes" />
+        
+        <!-- Register Monitor Windows Service -->
+        <ServiceInstall Id="MonitorSvcInstall"
+                        Type="ownProcess"
+                        Name="1stProtectMonitor"
+                        DisplayName="1stProtect Monitor"
+                        Description="Background HTTP status monitor for 1stProtect"
+                        Start="auto"
+                        ErrorControl="normal" />
+        
+        <!-- Monitor expects Logger to be around implicitly -->
+        <ServiceControl Id="MonitorSvcControl" 
+                        Start="install" 
+                        Stop="both" 
+                        Remove="uninstall" 
+                        Name="1stProtectMonitor" 
+                        Wait="yes" />
+      </Component>
+    </ComponentGroup>
+  </Fragment>
+</Wix>

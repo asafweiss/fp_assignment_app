@@ -1,0 +1,27 @@
+# ============================================================
+# 1stProtect App — .gitignore
+# ============================================================
+
+# ----- Build output -----
+build/*.exe
+build/*.msi
+build/*.wixpdb
+build/*.cab
+build/*.log
+# Keep hash files — referenced by the hash-integrity test
+!build/*.sha256
+
+# ----- Go binaries -----
+*.exe
+cmd/monitor/monitor
+cmd/logger/logger
+
+# ----- Logs -----
+*.log
+burn.log
+
+# ----- IDE -----
+.vscode/
+.idea/
+*.suo
+*.user

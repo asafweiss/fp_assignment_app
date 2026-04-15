@@ -1,0 +1,16 @@
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs" xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal">
+  <Bundle Name="1stProtectApp Installer" Version="1.0.1.0" Manufacturer="1stProtect" UpgradeCode="e1d2c3b4-a5f6-47e8-b9c0-d1e2f3a4b5c6">
+    <BootstrapperApplication>
+      <bal:WixStandardBootstrapperApplication LicenseUrl="https://example.com/license" Theme="hyperlinkLicense" />
+    </BootstrapperApplication>
+    
+    <!-- Variable to allow the EXE bootstrapper to receive LOG_LEVEL and pass it to MSI -->
+    <Variable Name="LOG_LEVEL" Value="INFO" bal:Overridable="yes" />
+    
+    <Chain>
+      <MsiPackage SourceFile="..\build\app.msi" Compressed="yes">
+        <MsiProperty Name="LOG_LEVEL" Value="[LOG_LEVEL]" />
+      </MsiPackage>
+    </Chain>
+  </Bundle>
+</Wix>
