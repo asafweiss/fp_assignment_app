@@ -45,11 +45,8 @@ $ErrorActionPreference = "Stop"
 $ProjectDir   = $PSScriptRoot
 # Artifacts are published to the shared sibling folder so the test suite
 # can locate them without needing any environment variable overrides.
-$BuildDir     = (Resolve-Path "$PSScriptRoot\..\artifacts" -ErrorAction SilentlyContinue)?.Path
-if (-not $BuildDir) {
-    $BuildDir = Join-Path (Split-Path $PSScriptRoot -Parent) "artifacts"
-    New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null
-}
+$BuildDir = Join-Path (Split-Path $PSScriptRoot -Parent) "artifacts"
+if (-Not (Test-Path $BuildDir)) { New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null }
 $PackagingDir = Join-Path $ProjectDir "packaging"
 
 Write-Host "Artifacts output directory: $BuildDir"
