@@ -18,7 +18,7 @@
     <ComponentGroup Id="AppComponents" Directory="INSTALLFOLDER">
       <Component Id="LoggerExecutable" Guid="a659cc68-3e5e-4c7b-91db-75ae21dfc6a3">
         <!-- Deploy the compiled Logger Go binary -->
-        <File Id="LoggerExe" Source="..\build\logger.exe" KeyPath="yes" />
+        <File Id="LoggerExe" Source="..\..\artifacts\logger.exe" KeyPath="yes" />
         
         <!-- Register as a background Windows Service -->
         <ServiceInstall Id="LoggerSvcInstall"
@@ -48,7 +48,7 @@
 
       <Component Id="MonitorExecutable" Guid="3f69527e-85a7-47b2-b1e7-fb6cfc989c97">
         <!-- Deploy the compiled Monitor Go binary -->
-        <File Id="MonitorExe" Source="..\build\monitor.exe" KeyPath="yes" />
+        <File Id="MonitorExe" Source="..\..\artifacts\monitor.exe" KeyPath="yes" />
         
         <!-- Register Monitor Windows Service -->
         <ServiceInstall Id="MonitorSvcInstall"

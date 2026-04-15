@@ -8,7 +8,7 @@
     <Variable Name="LOG_LEVEL" Value="INFO" bal:Overridable="yes" />
     
     <Chain>
-      <MsiPackage SourceFile="..\build\app.msi" Compressed="yes">
+      <MsiPackage SourceFile="..\..\artifacts\app.msi" Compressed="yes">
         <MsiProperty Name="LOG_LEVEL" Value="[LOG_LEVEL]" />
       </MsiPackage>
     </Chain>

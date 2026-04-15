@@ -113,20 +113,9 @@ go build -o $MonitorExePath .\cmd\monitor\main.go
 Pop-Location
 
 # ---------------------------------------------------------------------------
-# Step 3: Hash the compiled binaries
+# Step 3: Create (or reuse) a self-signed code-signing certificate
 # ---------------------------------------------------------------------------
-Write-Host "3. Generating SHA256 hashes..."
-
-# Hashes are stored next to each binary.  The test suite reads these files from
-# the controller and compares them against hashes computed on the DUT to verify
-# that the installer has not tampered with or corrupted the binaries.
-Set-Content -Path (Join-Path $BuildDir "logger.exe.sha256")  -Value (Get-FileHash -Path $LoggerExePath  -Algorithm SHA256).Hash
-Set-Content -Path (Join-Path $BuildDir "monitor.exe.sha256") -Value (Get-FileHash -Path $MonitorExePath -Algorithm SHA256).Hash
-
-# ---------------------------------------------------------------------------
-# Step 4: Create (or reuse) a self-signed code-signing certificate
-# ---------------------------------------------------------------------------
-Write-Host "4. Setting up code-signing certificate..."
+Write-Host "3. Setting up code-signing certificate..."
 
 $CertValue = Get-ChildItem -Path Cert:\CurrentUser\My |
     Where-Object { $_.Subject -match "1stProtectTest" } |
@@ -141,12 +130,23 @@ if (-not $CertValue) {
 }
 
 # ---------------------------------------------------------------------------
-# Step 5: Sign the compiled executables
+# Step 4: Sign the compiled executables
 # ---------------------------------------------------------------------------
-Write-Host "5. Signing executables..."
+Write-Host "4. Signing executables..."
 
-Set-AuthenticodeSignature -Certificate $CertValue -FilePath $LoggerExePath  -HashAlgorithm SHA256
-Set-AuthenticodeSignature -Certificate $CertValue -FilePath $MonitorExePath -HashAlgorithm SHA256
+Set-AuthenticodeSignature -Certificate $CertValue -FilePath $LoggerExePath  -HashAlgorithm SHA256 | Out-Null
+Set-AuthenticodeSignature -Certificate $CertValue -FilePath $MonitorExePath -HashAlgorithm SHA256 | Out-Null
+
+# ---------------------------------------------------------------------------
+# Step 5: Hash the signed binaries
+# ---------------------------------------------------------------------------
+Write-Host "5. Generating SHA256 hashes..."
+
+# Hashes are stored next to each binary.  The test suite reads these files from
+# the controller and compares them against hashes computed on the DUT to verify
+# that the installer has not tampered with or corrupted the binaries.
+Set-Content -Path (Join-Path $BuildDir "logger.exe.sha256")  -Value (Get-FileHash -Path $LoggerExePath  -Algorithm SHA256).Hash
+Set-Content -Path (Join-Path $BuildDir "monitor.exe.sha256") -Value (Get-FileHash -Path $MonitorExePath -Algorithm SHA256).Hash
 
 # ---------------------------------------------------------------------------
 # Step 6: Build the WiX MSI
