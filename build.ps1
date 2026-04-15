@@ -30,7 +30,7 @@
 
     Output
     ------
-    build/
+    ../artifacts/           ← shared folder at the monorepo root
     ├── logger.exe                    ← compiled Logger service
     ├── logger.exe.sha256
     ├── monitor.exe                   ← compiled Monitor service
@@ -43,10 +43,16 @@
 $ErrorActionPreference = "Stop"
 
 $ProjectDir   = $PSScriptRoot
-$BuildDir     = Join-Path $ProjectDir "build"
+# Artifacts are published to the shared sibling folder so the test suite
+# can locate them without needing any environment variable overrides.
+$BuildDir     = (Resolve-Path "$PSScriptRoot\..\artifacts" -ErrorAction SilentlyContinue)?.Path
+if (-not $BuildDir) {
+    $BuildDir = Join-Path (Split-Path $PSScriptRoot -Parent) "artifacts"
+    New-Item -ItemType Directory -Force -Path $BuildDir | Out-Null
+}
 $PackagingDir = Join-Path $ProjectDir "packaging"
 
-if (-Not (Test-Path $BuildDir)) { New-Item -ItemType Directory -Path $BuildDir | Out-Null }
+Write-Host "Artifacts output directory: $BuildDir"
 
 # ---------------------------------------------------------------------------
 # Step 0: Bootstrap WiX v4 toolchain
